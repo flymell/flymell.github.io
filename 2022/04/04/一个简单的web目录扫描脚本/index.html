@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>一个简单的web目录扫描脚本 | flymell</title><meta name="keywords" content="python学习,小工具"><meta name="author" content="flymell"><meta name="copyright" content="flymell"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="忏悔近忙于追剧和有一点堕落，所以blog停更了，哎，下次争取不会这样了 前言Python 学习是这段时间开始学习的，前几次学习都在本地上记录着，没有上传到blog，从这次开始，我就开始上传到blog上。 脚本呈现先直接上脚本 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个简单的web目录扫描脚本">
+<meta property="og:url" content="https://flymell.github.io/2022/04/04/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84web%E7%9B%AE%E5%BD%95%E6%89%AB%E6%8F%8F%E8%84%9A%E6%9C%AC/index.html">
+<meta property="og:site_name" content="flymell">
+<meta property="og:description" content="忏悔近忙于追剧和有一点堕落，所以blog停更了，哎，下次争取不会这样了 前言Python 学习是这段时间开始学习的，前几次学习都在本地上记录着，没有上传到blog，从这次开始，我就开始上传到blog上。 脚本呈现先直接上脚本 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://flymell.github.io/images/cover/yingzi.png">
+<meta property="article:published_time" content="2022-04-04T02:23:25.000Z">
+<meta property="article:modified_time" content="2022-04-04T03:28:21.980Z">
+<meta property="article:author" content="flymell">
+<meta property="article:tag" content="python学习">
+<meta property="article:tag" content="小工具">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://flymell.github.io/images/cover/yingzi.png"><link rel="shortcut icon" href="/img/favicon.jpg"><link rel="canonical" href="https://flymell.github.io/2022/04/04/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84web%E7%9B%AE%E5%BD%95%E6%89%AB%E6%8F%8F%E8%84%9A%E6%9C%AC/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery@2/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '一个简单的web目录扫描脚本',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-04-04 11:28:21'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 5.4.1"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/my_pic/touxiang.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><div class="data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a></div><div class="data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a></div><div class="data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/images/cover/yingzi.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">flymell</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">一个简单的web目录扫描脚本</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-04-04T02:23:25.000Z" title="发表于 2022-04-04 10:23:25">2022-04-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-04-04T03:28:21.980Z" title="更新于 2022-04-04 11:28:21">2022-04-04</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="一个简单的web目录扫描脚本"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="忏悔"><a href="#忏悔" class="headerlink" title="忏悔"></a>忏悔</h1><p>近忙于追剧和有一点堕落，所以blog停更了，哎，下次争取不会这样了</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>Python 学习是这段时间开始学习的，前几次学习都在本地上记录着，没有上传到blog，从这次开始，我就开始上传到blog上。</p>
+<h1 id="脚本呈现"><a href="#脚本呈现" class="headerlink" title="脚本呈现"></a>脚本呈现</h1><p>先直接上脚本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> getopt</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">help</span>():</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    -h 查看帮助</span></span><br><span class="line"><span class="string">    -u + 目标的url&#x27;&#x27;&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">scan</span>(<span class="params">tar_url</span>):</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        f = <span class="built_in">open</span>(<span class="string">&#x27;./php2.txt&#x27;</span>,<span class="string">&#x27;r&#x27;</span>,encoding=<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">        url_list1 = f.readlines()</span><br><span class="line">        f.close()</span><br><span class="line">        url_list = []</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> url_list1:</span><br><span class="line">            url_list.append(i.rstrip(<span class="string">&#x27;\n&#x27;</span>))</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;文件读取错误,请检查字典文字路径！&#x27;</span>)</span><br><span class="line">        exit()</span><br><span class="line">        </span><br><span class="line"></span><br><span class="line">    header = &#123;</span><br><span class="line">            <span class="string">&#x27;User-Agent&#x27;</span>: <span class="string">&#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) 			  AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept&#x27;</span>:<span class="string">&#x27;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Content-Type&#x27;</span>: <span class="string">&#x27;application/x-www-form-urlencoded&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept&#x27;</span>: <span class="string">&#x27;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept-Encoding&#x27;</span>: <span class="string">&#x27;gzip, deflate&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept-Language&#x27;</span>: <span class="string">&#x27;zh-CN,zh;q=0.9&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">    <span class="keyword">try</span>:    </span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> url_list:</span><br><span class="line">            scan_url = i</span><br><span class="line">            target_url = tar_url+scan_url</span><br><span class="line">            re = requests.get(target_url,headers=header,timeout=<span class="number">5</span>)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;[&#123;&#125;] ==&gt; &#123;&#125;&quot;</span>.<span class="built_in">format</span>(re.status_code,target_url))</span><br><span class="line">            <span class="keyword">if</span> re.status_code == <span class="number">200</span>:</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;[&#123;&#125;] ==&gt; &#123;&#125; 访问成功!&quot;</span>.<span class="built_in">format</span>(re.status_code,target_url))</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;连接失败，请检查目标地址是否存在！&quot;</span>)</span><br><span class="line">opts,args = getopt.getopt(sys.argv[<span class="number">1</span>:],</span><br><span class="line"><span class="string">&#x27;hu:&#x27;</span>,</span><br><span class="line">[<span class="string">&#x27;help&#x27;</span>,<span class="string">&#x27;url=&#x27;</span>])</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span>():</span></span><br><span class="line">    <span class="keyword">for</span> o,a <span class="keyword">in</span> opts:</span><br><span class="line">        <span class="keyword">if</span> o <span class="keyword">in</span> [<span class="string">&#x27;-h&#x27;</span>,<span class="string">&#x27;--help&#x27;</span>]:</span><br><span class="line">            <span class="built_in">help</span>()</span><br><span class="line">        <span class="keyword">elif</span> o <span class="keyword">in</span> [<span class="string">&#x27;-u&#x27;</span>,<span class="string">&#x27;--url&#x27;</span>]:</span><br><span class="line">            tar_url = a</span><br><span class="line">            scan(tar_url)</span><br><span class="line">main()</span><br></pre></td></tr></table></figure>
+
+<p>其实这个脚本很简单，功能很单一，也没有加多线程，扫描速读比较慢，但是思路简单，方便初学者理解。</p>
+<h1 id="相关代码解释"><a href="#相关代码解释" class="headerlink" title="相关代码解释"></a>相关代码解释</h1><h2 id="该脚本主要分为3大部分"><a href="#该脚本主要分为3大部分" class="headerlink" title="该脚本主要分为3大部分"></a>该脚本主要分为3大部分</h2><ul>
+<li><p>help() 函数，方便使用者快速入手该脚本</p>
+</li>
+<li><p>scan() 函数，是核心功能，实现扫描网站后台的功能，里面还有<strong>读取字典文件（./php2.txt）</strong>该字典文件自己可以自定义，要主要字典文件的编码问题，需要在open() 函数声明是 gbk 还是 utf-8</p>
+<p><code>f = open(&#39;./php2.txt&#39;,&#39;r&#39;,encoding=&#39;utf-8&#39;)</code></p>
+<p><code>f = open(&#39;./php2.txt&#39;,&#39;r&#39;,encoding=&#39;gbk&#39;)</code></p>
+</li>
+<li><p>main() 函数，是结合 sys和getopt 库获取用户输入的目标url  然后调用scan()函数</p>
+</li>
+</ul>
+<h2 id="一些小坑"><a href="#一些小坑" class="headerlink" title="一些小坑"></a>一些小坑</h2><ol>
+<li><p>打开字典文件问题，大概率就是字典文件编码问题，要注意在open()函数里修改</p>
+</li>
+<li><p>exit() 和break  ，break 函数是用在while 和 for 循环语句中，exit可以用在if中</p>
+</li>
+<li><p>就是当读取到字典里的后台地址并生成数组后，如何将这数组里的后台地址一个一个的访问，这里写循环和缩进时容易被绕晕。</p>
+<p>·```</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> url_list:</span><br><span class="line">            scan_url = i</span><br><span class="line">            target_url = tar_url+scan_url</span><br><span class="line">            re = requests.get(target_url,headers=header,timeout=<span class="number">5</span>)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;[&#123;&#125;] ==&gt; &#123;&#125;&quot;</span>.<span class="built_in">format</span>(re.status_code,target_url))</span><br><span class="line">            <span class="keyword">if</span> re.status_code == <span class="number">200</span>:</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&quot;[&#123;&#125;] ==&gt; &#123;&#125; 访问成功!&quot;</span>.<span class="built_in">format</span>(re.status_code,target_url))</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h1><p><code>python3 &#39;脚本的文件名&#39; -u https://flymell.space/</code> **网址最后一定要加【/】因为字典的网址路径没有带【/】</p>
+<p>例如：<code>python3 test.py -u https://flymell.space/</code></p>
+<p>效果图：</p>
+<p><img src="/images/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84web%E7%9B%AE%E5%BD%95%E6%89%AB%E6%8F%8F%E8%84%9A%E6%9C%AC/image-20220404112716034.png" alt="image-20220404112716034"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">flymell</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://flymell.github.io/2022/04/04/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84web%E7%9B%AE%E5%BD%95%E6%89%AB%E6%8F%8F%E8%84%9A%E6%9C%AC/">https://flymell.github.io/2022/04/04/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84web%E7%9B%AE%E5%BD%95%E6%89%AB%E6%8F%8F%E8%84%9A%E6%9C%AC/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://flymell.github.io" target="_blank">flymell</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/python%E5%AD%A6%E4%B9%A0/">python学习</a><a class="post-meta__tags" href="/tags/%E5%B0%8F%E5%B7%A5%E5%85%B7/">小工具</a></div><div class="post_share"><div class="social-share" data-image="/images/cover/yingzi.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2022/03/13/XSS%E5%88%A9%E7%94%A81/"><img class="next-cover" src="/images/cover/xiyang.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">XSS利用1</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/my_pic/touxiang.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">flymell</div><div class="author-info__description">迈小步、不停步，天天进步</div></div><div class="card-info-data is-center"><div class="card-info-data-item"><a href="/archives/"><div class="headline">文章</div><div class="length-num">4</div></a></div><div class="card-info-data-item"><a href="/tags/"><div class="headline">标签</div><div class="length-num">8</div></a></div><div class="card-info-data-item"><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BF%8F%E6%82%94"><span class="toc-number">1.</span> <span class="toc-text">忏悔</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">2.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%84%9A%E6%9C%AC%E5%91%88%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">脚本呈现</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E4%BB%A3%E7%A0%81%E8%A7%A3%E9%87%8A"><span class="toc-number">4.</span> <span class="toc-text">相关代码解释</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%A5%E8%84%9A%E6%9C%AC%E4%B8%BB%E8%A6%81%E5%88%86%E4%B8%BA3%E5%A4%A7%E9%83%A8%E5%88%86"><span class="toc-number">4.1.</span> <span class="toc-text">该脚本主要分为3大部分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%BA%9B%E5%B0%8F%E5%9D%91"><span class="toc-number">4.2.</span> <span class="toc-text">一些小坑</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="toc-number">5.</span> <span class="toc-text">使用方法</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/04/04/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84web%E7%9B%AE%E5%BD%95%E6%89%AB%E6%8F%8F%E8%84%9A%E6%9C%AC/" title="一个简单的web目录扫描脚本"><img src="/images/cover/yingzi.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="一个简单的web目录扫描脚本"/></a><div class="content"><a class="title" href="/2022/04/04/%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84web%E7%9B%AE%E5%BD%95%E6%89%AB%E6%8F%8F%E8%84%9A%E6%9C%AC/" title="一个简单的web目录扫描脚本">一个简单的web目录扫描脚本</a><time datetime="2022-04-04T02:23:25.000Z" title="发表于 2022-04-04 10:23:25">2022-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/03/13/XSS%E5%88%A9%E7%94%A81/" title="XSS利用1"><img src="/images/cover/xiyang.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="XSS利用1"/></a><div class="content"><a class="title" href="/2022/03/13/XSS%E5%88%A9%E7%94%A81/" title="XSS利用1">XSS利用1</a><time datetime="2022-03-13T14:44:24.000Z" title="发表于 2022-03-13 22:44:24">2022-03-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/03/09/%E3%80%90MRCTF2020%E3%80%91Ez-bypass/" title="【MRCTF2020】Ez_bypass"><img src="/images/cover/study.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【MRCTF2020】Ez_bypass"/></a><div class="content"><a class="title" href="/2022/03/09/%E3%80%90MRCTF2020%E3%80%91Ez-bypass/" title="【MRCTF2020】Ez_bypass">【MRCTF2020】Ez_bypass</a><time datetime="2022-03-09T14:19:37.000Z" title="发表于 2022-03-09 22:19:37">2022-03-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/03/09/%E4%B8%8D%E6%AD%BB%E9%A9%AC%E7%9A%84%E5%88%A9%E7%94%A8%E5%92%8C%E5%88%A0%E9%99%A4/" title="不死马的利用和删除"><img src="/images/cover/lovelydog.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="不死马的利用和删除"/></a><div class="content"><a class="title" href="/2022/03/09/%E4%B8%8D%E6%AD%BB%E9%A9%AC%E7%9A%84%E5%88%A9%E7%94%A8%E5%92%8C%E5%88%A0%E9%99%A4/" title="不死马的利用和删除">不死马的利用和删除</a><time datetime="2022-03-09T13:11:38.000Z" title="发表于 2022-03-09 21:11:38">2022-03-09</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/images/cover/yingzi.png')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By flymell</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/fireworks.min.js"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/canvas-fluttering-ribbon.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer@1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/gh/metowolf/MetingJS@1.2/dist/Meting.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
